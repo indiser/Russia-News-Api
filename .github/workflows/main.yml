@@ -1,0 +1,25 @@
+name: Update heatmap
+
+on:
+  schedule:
+    - cron: "0 * * * *"   # hourly, UTC. GitHub may delay few minutes.
+  workflow_dispatch: {}    # manual "Run workflow" button
+
+concurrency:
+  group: update-heatmap
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python seed.py
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
